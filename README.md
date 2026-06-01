@@ -284,7 +284,7 @@ VinhPhu/
 
 ### posts table
 ```sql
-id (BIGINT PK), post_message (TEXT), user_name (VARCHAR),
+id (TEXT PK), post_message (TEXT), user_name (VARCHAR),
 timestamp_post (BIGINT), num_like_post (INT), num_comment_post (INT),
 num_share_post (INT), engagement_score (FLOAT), text_length (INT),
 image_count (INT), label (INT), image_path (TEXT), created_at (TIMESTAMP)
@@ -292,7 +292,7 @@ image_count (INT), label (INT), image_path (TEXT), created_at (TIMESTAMP)
 
 ### predictions table
 ```sql
-id (BIGSERIAL PK), post_id (BIGINT FK), prediction (VARCHAR: REAL/FAKE),
+id (BIGSERIAL PK), post_id (TEXT FK), prediction (VARCHAR: REAL/FAKE),
 confidence (FLOAT), text_weight (FLOAT), image_weight (FLOAT),
 meta_weight (FLOAT), trust_score (FLOAT), created_at (TIMESTAMP)
 ```
