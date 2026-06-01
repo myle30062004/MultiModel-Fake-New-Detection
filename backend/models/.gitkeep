@@ -1,0 +1,3 @@
+# Add the trained model files below:
+# - phobert_text_best/ (tokenizer + PhoBERT weights)
+# - multimodal_model.pth (trained multimodal checkpoint)

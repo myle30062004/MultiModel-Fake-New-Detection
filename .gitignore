@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+ENV/
+dist/
+build/
+*.egg-info/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.env.local
+.env.*.local
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+uploads/images/*
+!uploads/images/.gitkeep
+*.pth
+*.pt
+*.pkl
+.env
+
+# Database
+*.db
+*.sqlite
+database/reintel_final_dataset/*

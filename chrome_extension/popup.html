@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NewsGuard Detector</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>NewsGuard</h1>
+      <p>Multimodal Fake News Detector</p>
+    </header>
+
+    <div id="status" class="status">Ready to analyze the current page.</div>
+
+    <button id="detectBtn" class="primary-btn">Analyze Page</button>
+
+    <div id="loader" class="loader hidden"></div>
+
+    <div id="resultCard" class="result-card hidden">
+      <div class="result-header">
+        <span id="predictionLabel" class="prediction-label"></span>
+        <span id="confidenceBadge" class="confidence-badge"></span>
+      </div>
+      <div class="score-grid">
+        <div><span class="score-title">Text</span><span id="textScore">0.00</span></div>
+        <div><span class="score-title">Image</span><span id="imageScore">0.00</span></div>
+        <div><span class="score-title">Metadata</span><span id="metaScore">0.00</span></div>
+        <div><span class="score-title">Fact-check</span><span id="factScore">0.00</span></div>
+      </div>
+
+      <div class="explanation-block">
+        <h2>Why?</h2>
+        <ul id="explanations"></ul>
+      </div>
+
+      <div id="metadata" class="metadata-block"></div>
+
+      <div class="footer-note">Model output is advisory. Verify the source before sharing.</div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
