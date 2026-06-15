@@ -1,0 +1,47 @@
+export const samplePosts = [
+  {
+    id: 'sample-1',
+    user_name: 'Civic Watchdesk',
+    post_message:
+      'A viral post claims a city-wide emergency order starts tonight, but no official agency has confirmed the announcement. Residents are sharing screenshots without a source link.',
+    timestamp_post: 1765459200,
+    num_like_post: 1840,
+    num_comment_post: 326,
+    num_share_post: 512,
+    engagement_score: 2678,
+    text_length: 184,
+    image_count: 1,
+    label: 1,
+    image_path: null,
+  },
+  {
+    id: 'sample-2',
+    user_name: 'Health Policy Lab',
+    post_message:
+      'Researchers published updated vaccination coverage data with links to the original report, confidence intervals, and methodology notes.',
+    timestamp_post: 1765200000,
+    num_like_post: 954,
+    num_comment_post: 102,
+    num_share_post: 188,
+    engagement_score: 1244,
+    text_length: 137,
+    image_count: 0,
+    label: 0,
+    image_path: null,
+  },
+  {
+    id: 'sample-3',
+    user_name: 'Global Signal Desk',
+    post_message:
+      'Breaking: an unverified image is being used to connect two unrelated events. Reverse-image checks suggest the photo appeared online months earlier.',
+    timestamp_post: 1764940800,
+    num_like_post: 2240,
+    num_comment_post: 448,
+    num_share_post: 799,
+    engagement_score: 3487,
+    text_length: 153,
+    image_count: 1,
+    label: 1,
+    image_path: null,
+  },
+];

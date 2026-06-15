@@ -120,7 +120,7 @@ docker run -d \
   -e POSTGRES_DB=newsguard \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 \
+  -p 5433:5432 \
   -v postgres_data:/var/lib/postgresql/data \
   postgres:15-alpine
 ```
@@ -146,7 +146,7 @@ psql -U postgres -d newsguard -f database/migrations/002_create_predictions_tabl
 
 ```bash
 python scripts/import_arrow.py \
-  --arrow /path/to/dataset.parquet \
+  --arrow /database/reintel_final_dataset \
   --db-url "postgresql://postgres:postgres@localhost:5432/newsguard" \
   --output-dir uploads/images
 ```

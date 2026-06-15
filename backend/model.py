@@ -34,15 +34,24 @@ class MultiModel(nn.Module):
 
         self.norm = nn.LayerNorm(1024 + 128 + 32)
 
-    def forward(self, input_ids=None, attention_mask=None, meta=None, image=None):
+    def forward(self, input_ids=None, attention_mask=None, meta=None, image=None, image_available=None):
         text_outputs = self.text_model(input_ids=input_ids, attention_mask=attention_mask)
         text_cls = text_outputs.last_hidden_state[:, 0, :]
 
         image_feat = self.image_model(image)
+        image_mask = None
+        if image_available is not None:
+            image_mask = image_available.view(-1, 1).to(image_feat.dtype)
+            image_feat = image_feat * image_mask
+
         meta_feat = self.meta_fc(meta)
 
         fused = torch.cat([text_cls, image_feat, meta_feat], dim=1)
         weights = self.gate(fused)
+        if image_mask is not None:
+            weights = weights.clone()
+            weights[:, 1] = weights[:, 1] * image_mask.squeeze(1)
+            weights = weights / weights.sum(dim=1, keepdim=True).clamp_min(1e-6)
 
         w_text = weights[:, 0].unsqueeze(1) * 0.5 + 0.5
         w_img = weights[:, 1].unsqueeze(1) * 0.5

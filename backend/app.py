@@ -4,10 +4,10 @@ from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, HttpUrl, validator
-from typing import Optional
+from typing import Any, Dict, Optional
 
-from .predictor import Predictor
-from . import database
+from predictor import Predictor
+import database
 
 app = FastAPI(title="Multimodal Fake News API", version="1.0.0")
 
@@ -31,6 +31,7 @@ class PredictionPayload(BaseModel):
     title: str
     content: str
     image_url: Optional[HttpUrl] = None
+    metadata: Optional[Dict[str, Any]] = None
 
     @validator("title")
     def title_non_empty(cls, value: str):
@@ -125,6 +126,7 @@ async def predict(payload: PredictionPayload, request: Request):
             content=payload.content,
             image_url=str(payload.image_url) if payload.image_url else None,
             client_ip=client_ip,
+            post_metadata=payload.metadata or {},
         )
         return response
     except ValueError as exc:

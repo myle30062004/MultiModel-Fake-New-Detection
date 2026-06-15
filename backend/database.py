@@ -6,7 +6,7 @@ from psycopg2.extras import RealDictCursor
 from typing import Optional, List,Dict, Any
 import os
 
-DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:1234@localhost:5433/newsguard")
+DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5433/newsguard")
 
 # -----------------------------
 # DB CONNECTION

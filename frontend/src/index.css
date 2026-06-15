@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #f0f2f5;
+  color: #050505;
+  font-family: Inter, Roboto, system-ui, sans-serif;
+}
+
+.dark body {
+  background: #10141f;
+  color: #f5f6f8;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(24, 119, 242, 0.35);
+  outline-offset: 2px;
+}
+
+@layer components {
+  .surface {
+    @apply rounded-lg border border-zinc-200 bg-white shadow-soft dark:border-white/10 dark:bg-zinc-900;
+  }
+
+  .subtle-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #bcc0c4 transparent;
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar-thumb {
+    background: #bcc0c4;
+    border-radius: 999px;
+  }
+}

@@ -7,40 +7,99 @@
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>NewsGuard</h1>
-      <p>Multimodal Fake News Detector</p>
+  <main class="popup-shell">
+    <header class="popup-header">
+      <div class="brand-mark" aria-hidden="true">N</div>
+      <div class="brand-copy">
+        <h1>NewsGuard</h1>
+        <p>Multimodal Fake News Detection</p>
+      </div>
+      <span id="statusIndicator" class="status-dot online" title="Ready"></span>
     </header>
 
-    <div id="status" class="status">Ready to analyze the current page.</div>
-
-    <button id="detectBtn" class="primary-btn">Analyze Page</button>
-
-    <div id="loader" class="loader hidden"></div>
-
-    <div id="resultCard" class="result-card hidden">
-      <div class="result-header">
-        <span id="predictionLabel" class="prediction-label"></span>
-        <span id="confidenceBadge" class="confidence-badge"></span>
+    <section class="scanner-card" aria-labelledby="scannerTitle">
+      <div>
+        <h2 id="scannerTitle">Page Scanner</h2>
+        <p id="status">Ready to scan the current webpage.</p>
       </div>
-      <div class="score-grid">
-        <div><span class="score-title">Text</span><span id="textScore">0.00</span></div>
-        <div><span class="score-title">Image</span><span id="imageScore">0.00</span></div>
-        <div><span class="score-title">Metadata</span><span id="metaScore">0.00</span></div>
-        <div><span class="score-title">Fact-check</span><span id="factScore">0.00</span></div>
+      <button id="detectBtn" class="primary-btn" type="button">
+        <span class="btn-icon" aria-hidden="true"></span>
+        Scan Current Page
+      </button>
+      <div id="loader" class="scan-loader hidden" aria-hidden="true">
+        <span></span><span></span><span></span>
       </div>
+    </section>
 
-      <div class="explanation-block">
-        <h2>Why?</h2>
-        <ul id="explanations"></ul>
+    <section id="resultCard" class="result-card hidden" aria-labelledby="resultTitle">
+      <div class="section-heading">
+        <h2 id="resultTitle">Detection Result</h2>
+        <span id="processingTime" class="meta-chip">0.00s</span>
       </div>
 
-      <div id="metadata" class="metadata-block"></div>
+      <div class="result-hero">
+        <span id="predictionLabel" class="prediction-badge">Pending</span>
+        <div class="confidence-ring">
+          <strong id="confidenceValue">0%</strong>
+          <span>confidence</span>
+        </div>
+      </div>
 
-      <div class="footer-note">Model output is advisory. Verify the source before sharing.</div>
-    </div>
-  </div>
+      <div class="risk-row">
+        <span>Risk level</span>
+        <strong id="riskLevel">Unknown</strong>
+      </div>
+
+      <div class="score-bars">
+        <div class="score-item">
+          <div><span>Text</span><strong id="textScore">0.00</strong></div>
+          <meter id="textMeter" min="0" max="1" value="0"></meter>
+        </div>
+        <div class="score-item">
+          <div><span>Image</span><strong id="imageScore">0.00</strong></div>
+          <meter id="imageMeter" min="0" max="1" value="0"></meter>
+        </div>
+        <div class="score-item">
+          <div><span>Metadata</span><strong id="metaScore">0.00</strong></div>
+          <meter id="metaMeter" min="0" max="1" value="0"></meter>
+        </div>
+      </div>
+    </section>
+
+    <section id="explainabilityCard" class="explain-card hidden" aria-labelledby="explainTitle">
+      <div class="section-heading">
+        <h2 id="explainTitle">Explainability</h2>
+      </div>
+
+      <div class="explain-block">
+        <h3>Suspicious keywords</h3>
+        <div id="keywordList" class="keyword-list"></div>
+      </div>
+
+      <div class="explain-block">
+        <h3>Highlighted sentences</h3>
+        <ul id="sentenceList" class="sentence-list"></ul>
+      </div>
+
+      <div class="explain-block">
+        <h3>Reasoning summary</h3>
+        <p id="reasoningSummary">Run a scan to see model reasoning.</p>
+      </div>
+    </section>
+
+    <section class="quick-actions" aria-label="Quick actions">
+      <button id="fullReportBtn" class="secondary-btn" type="button">View Full Report</button>
+      <button id="reanalyzeBtn" class="secondary-btn" type="button">Reanalyze</button>
+      <button id="saveBtn" class="secondary-btn" type="button">Save Result</button>
+    </section>
+
+    <footer class="popup-footer">
+      <span>v1.0.0</span>
+      <button id="settingsBtn" type="button">Settings</button>
+      <button id="feedbackBtn" type="button">Feedback</button>
+    </footer>
+  </main>
+
   <script src="popup.js"></script>
 </body>
 </html>

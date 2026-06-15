@@ -2,7 +2,7 @@ import re
 import math
 import time
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -11,7 +11,7 @@ import torch
 import torchvision.transforms as T
 from transformers import AutoTokenizer
 
-from .model import load_multimodal_model
+from model import load_multimodal_model
 
 BASE_DIR = Path(__file__).resolve().parent
 CHECKPOINT_PATH = BASE_DIR / "models" / "reintel_final_model.pth"
@@ -56,7 +56,14 @@ def clickbait_score_for_text(title: str, content: str) -> float:
     return min(1.0, score / max_score)
 
 
-def build_metadata(title: str, content: str, meta_dim: int = 9) -> List[float]:
+def build_metadata(
+    title: str,
+    content: str,
+    post_metadata: Optional[Dict[str, Any]] = None,
+    meta_cols: Optional[List[str]] = None,
+    meta_dim: int = 9,
+) -> List[float]:
+    post_metadata = post_metadata or {}
     title_length = len(title)
     content_length = len(content)
     uppercase_words = count_uppercase_words(title + " " + content)
@@ -67,16 +74,38 @@ def build_metadata(title: str, content: str, meta_dim: int = 9) -> List[float]:
     sentence_count = max(1, len(re.findall(r"[.!?]+", content)))
     avg_word_length = sum(len(word) for word in re.findall(r"\w+", title + " " + content)) / max(1, len(re.findall(r"\w+", title + " " + content)))
 
+    feature_map = {
+        "title_length": float(title_length),
+        "content_length": float(content_length),
+        "uppercase_words": float(uppercase_words),
+        "exclamations": float(exclamations),
+        "questions": float(questions),
+        "url_count": float(url_count),
+        "clickbait": float(clickbait),
+        "sentence_count": float(sentence_count),
+        "avg_word_length": float(avg_word_length),
+        "text_length": float(post_metadata.get("text_length", content_length) or 0),
+        "image_count": float(post_metadata.get("image_count", 0) or 0),
+        "num_like_post": float(post_metadata.get("num_like_post", 0) or 0),
+        "num_comment_post": float(post_metadata.get("num_comment_post", 0) or 0),
+        "num_share_post": float(post_metadata.get("num_share_post", 0) or 0),
+        "engagement_score": float(post_metadata.get("engagement_score", 0) or 0),
+        "timestamp_post": float(post_metadata.get("timestamp_post", 0) or 0),
+    }
+
+    if meta_cols:
+        return [float(feature_map.get(col, post_metadata.get(col, 0.0)) or 0.0) for col in meta_cols]
+
     features = [
-        float(title_length),
-        float(content_length),
-        float(uppercase_words),
-        float(exclamations),
-        float(questions),
-        float(url_count),
-        float(clickbait),
-        float(sentence_count),
-        float(avg_word_length),
+        feature_map["title_length"],
+        feature_map["content_length"],
+        feature_map["uppercase_words"],
+        feature_map["exclamations"],
+        feature_map["questions"],
+        feature_map["url_count"],
+        feature_map["clickbait"],
+        feature_map["sentence_count"],
+        feature_map["avg_word_length"],
     ]
 
     if len(features) >= meta_dim:
@@ -219,13 +248,36 @@ class Predictor:
         self.model.to(DEVICE)
         self.transform = image_transform()
 
-    def predict(self, title: str, content: str, image_url: Optional[str], client_ip: str) -> dict:
+    def _scale_metadata_vector(self, metadata_vector: List[float]) -> List[float]:
+        if self.scaler is None:
+            return metadata_vector
+        try:
+            scaled = self.scaler.transform([metadata_vector])
+            return [float(value) for value in scaled[0]]
+        except Exception:
+            return metadata_vector
+
+    def predict(
+        self,
+        title: str,
+        content: str,
+        image_url: Optional[str],
+        client_ip: str,
+        post_metadata: Optional[Dict[str, Any]] = None,
+    ) -> dict:
         compute_rate_limit(client_ip)
 
         title = clamp_text(normalize_text(title), 1000)
         content = clamp_text(normalize_text(content), 10000)
 
-        metadata_vector = build_metadata(title, content, meta_dim=self.model.meta_fc[0].in_features)
+        metadata_vector = build_metadata(
+            title,
+            content,
+            post_metadata=post_metadata,
+            meta_cols=self.meta_cols,
+            meta_dim=self.model.meta_fc[0].in_features,
+        )
+        metadata_vector = self._scale_metadata_vector(metadata_vector)
         fact_check = build_fact_check(title)
         explanation = make_explanation(title, content, fact_check)
 
@@ -239,6 +291,9 @@ class Predictor:
         )
 
         image = self._prepare_image(image_url)
+        requested_image = bool(image_url)
+        has_image = image is not None
+        image_status = "loaded" if has_image else ("unavailable" if requested_image else "missing")
         if image is None:
             image = torch.zeros((3, IMAGE_SIZE, IMAGE_SIZE), dtype=torch.float)
 
@@ -247,6 +302,7 @@ class Predictor:
             "attention_mask": tokens["attention_mask"].to(DEVICE),
             "meta": torch.tensor([metadata_vector], dtype=torch.float, device=DEVICE),
             "image": image.unsqueeze(0).to(DEVICE),
+            "image_available": torch.tensor([1.0 if has_image else 0.0], dtype=torch.float, device=DEVICE),
         }
 
         with torch.no_grad():
@@ -271,6 +327,9 @@ class Predictor:
             "fact_check_score": fact_check["score"],
             "fact_check_details": fact_check["details"],
             "explanations": explanation,
+            "post_metadata": post_metadata or {},
+            "has_image": has_image,
+            "image_status": image_status,
         }
 
     def _prepare_image(self, image_url: Optional[str]) -> Optional[torch.Tensor]:

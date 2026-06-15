@@ -3,7 +3,7 @@
   "name": "NewsGuard Multimodal Detector",
   "description": "Detect potential fake news using text, image, and metadata analysis.",
   "version": "1.0.0",
-  "permissions": ["activeTab", "scripting", "tabs"],
+  "permissions": ["activeTab", "scripting", "tabs", "storage"],
   "host_permissions": ["<all_urls>"],
   "action": {
     "default_title": "NewsGuard Detector",
@@ -14,8 +14,9 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "matches": ["http://localhost/*", "http://127.0.0.1/*", "<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ]
 }
